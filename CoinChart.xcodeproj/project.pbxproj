@@ -6,6 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXCopyFilesBuildPhase section */
+		4D9149B32D8462F70071A45C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		4D91496E2D8455720071A45C /* CoinChart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoinChart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -55,6 +68,7 @@
 				4D91496A2D8455720071A45C /* Sources */,
 				4D91496B2D8455720071A45C /* Frameworks */,
 				4D91496C2D8455720071A45C /* Resources */,
+				4D9149B32D8462F70071A45C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -94,6 +108,8 @@
 			);
 			mainGroup = 4D9149652D8455720071A45C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4D91496F2D8455720071A45C /* Products */;
 			projectDirPath = "";
