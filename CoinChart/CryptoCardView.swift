@@ -16,78 +16,62 @@ struct CryptoCardView: View {
         }
     }
     
+    private func formatPercentage(_ percentage: Double) -> String {
+        return String(format: "%.2f", percentage)
+    }
+    
     private var priceColor: Color {
-        currency.priceChange24h >= 0 ? .red : .green
+        currency.priceChange24h >= 0 ? .green : .red
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        CardContent(
+            currency: currency,
+            isLoading: isLoading,
+            priceColor: priceColor,
+            formatPrice: formatPrice,
+            formatPercentage: formatPercentage,
+            onDelete: onDelete
+        )
+    }
+}
+
+
+private struct CardContent: View {
+    let currency: CryptoCurrency
+    let isLoading: Bool
+    let priceColor: Color
+    let formatPrice: (Double) -> String
+    let formatPercentage: (Double) -> String
+    let onDelete: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 12) {
             Text(currency.name)
-                .font(.headline)
+                .font(.subheadline)
+                .frame(width: 80, alignment: .leading)
             
             if isLoading {
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                    Text("正在获取数据...")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(height: 150)
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else if !currency.chartData.isEmpty {
+                ChartView(chartData: currency.chartData, priceColor: priceColor)
             } else {
-                HStack {
-                    Text("$\(formatPrice(currency.currentPrice))")
-                        .font(.title2)
-                        .bold()
-                    
-                    Spacer()
-                    
-                    Text("\(currency.priceChange24h >= 0 ? "+" : "-")\(formatPrice(abs(currency.priceChange24h)))%")
-                        .foregroundColor(priceColor)
-                        .font(.subheadline)
-                }
-                
-                if !currency.chartData.isEmpty {
-                    let minPrice = currency.chartData.min() ?? 0
-                    let maxPrice = currency.chartData.max() ?? 0
-                    let priceRange = maxPrice - minPrice
-                    
-                    Chart {
-                        let data = Array(currency.chartData.enumerated())
-                        ForEach(data, id: \.offset) { index, price in
-                            LineMark(
-                                x: .value("Time", index),
-                                y: .value("Price", price)
-                            )
-                            .foregroundStyle(
-                                .linearGradient(
-                                    colors: [
-                                        priceColor,
-                                        priceColor.opacity(0.5)
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .interpolationMethod(.catmullRom)
-                        }
-                    }
-                    .chartXAxis(.hidden)
-                    .chartYAxis(.hidden)
-                    .chartYScale(domain: max(0, minPrice - priceRange * 0.1)...maxPrice + priceRange * 0.1)
-                    .frame(height: 100)
-                    .padding(.vertical, 8)
-                }
+                Spacer()
             }
+            
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("$\(formatPrice(currency.currentPrice))")
+                    .font(.subheadline)
+                    .bold()
+                
+                Text("\(currency.priceChange24h >= 0 ? "+" : "")\(formatPercentage(currency.priceChange24h))%")
+                    .foregroundColor(priceColor)
+                    .font(.caption)
+            }
+            .frame(width: 100, alignment: .trailing)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color(.systemGray4).opacity(0.5), radius: 8, x: 0, y: 4)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color(.systemGray5), lineWidth: 0.5)
-        )
+        .frame(height: 60)
         .contextMenu {
             Button(role: .destructive) {
                 onDelete()
@@ -95,5 +79,56 @@ struct CryptoCardView: View {
                 Label("删除", systemImage: "trash")
             }
         }
+    }
+}
+
+private struct ChartView: View {
+    let chartData: [Double]
+    let priceColor: Color
+    
+    var body: some View {
+        let minPrice = chartData.min() ?? 0
+        let maxPrice = chartData.max() ?? 0
+        let priceRange = maxPrice - minPrice
+        let midPrice = (minPrice + maxPrice) / 2
+        let baseline = minPrice - priceRange * 0.05
+        
+        return Chart {
+            let data = Array(chartData.enumerated())
+            
+            RuleMark(y: .value("Mid", midPrice))
+                .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [3, 3]))
+                .foregroundStyle(Color.gray.opacity(0.5))
+            
+            ForEach(data, id: \.offset) { index, price in
+                AreaMark(
+                    x: .value("Time", index),
+                    yStart: .value("Baseline", baseline),
+                    yEnd: .value("Price", price)
+                )
+                .foregroundStyle(
+                    .linearGradient(
+                        colors: [priceColor.opacity(0.3), priceColor.opacity(0.05)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .interpolationMethod(.catmullRom)
+            }
+            
+            ForEach(data, id: \.offset) { index, price in
+                LineMark(
+                    x: .value("Time", index),
+                    y: .value("Price", price)
+                )
+                .foregroundStyle(priceColor)
+                .interpolationMethod(.catmullRom)
+            }
+        }
+        .chartXAxis(.hidden)
+        .chartYAxis(.hidden)
+        .chartYScale(domain: baseline...maxPrice + priceRange * 0.1)
+        .frame(height: 40)
+        .frame(maxWidth: .infinity)
     }
 } 

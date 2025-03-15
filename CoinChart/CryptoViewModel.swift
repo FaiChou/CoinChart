@@ -93,7 +93,7 @@ class CryptoViewModel: ObservableObject {
                 if let lastPrice = prices.last, let firstPrice = prices.first {
                     cryptocurrencies[index].currentPrice = lastPrice
                     let priceChange = ((lastPrice - firstPrice) / firstPrice) * 100
-                    cryptocurrencies[index].priceChange24h = priceChange
+                    cryptocurrencies[index].priceChange24h = Double(round(priceChange * 100) / 100)
                 }
             }
         } catch {

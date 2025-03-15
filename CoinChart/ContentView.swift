@@ -6,14 +6,13 @@ struct ContentView: View {
     @State private var newCryptoName = ""
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    if viewModel.isInitialLoading {
-                        ProgressView("加载中...")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.top, 40)
-                    } else {
+        NavigationStack {
+            Group {
+                if viewModel.isInitialLoading {
+                    ProgressView("加载中...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List {
                         ForEach(Array(viewModel.cryptocurrencies.enumerated()), id: \.element.id) { index, currency in
                             CryptoCardView(
                                 currency: currency,
@@ -22,14 +21,19 @@ struct ContentView: View {
                                 },
                                 isLoading: viewModel.refreshingCurrencies.contains(currency.name)
                             )
-                            .padding(.horizontal)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                            .listRowSeparator(.visible)
+                        }
+                        .onDelete { indexSet in
+                            for index in indexSet.sorted(by: >) {
+                                viewModel.removeCryptoCurrency(at: index)
+                            }
                         }
                     }
+                    .refreshable {
+                        await viewModel.refreshData()
+                    }
                 }
-                .padding(.vertical)
-            }
-            .refreshable {
-                await viewModel.refreshData()
             }
             .navigationTitle("CoinChart")
             .toolbar {
