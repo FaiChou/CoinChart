@@ -52,8 +52,6 @@ struct ContentView: View {
                         newCryptoName = ""
                     }
                 }
-            } message: {
-                Text("请输入要添加的加密货币名称")
             }
         }
     }
