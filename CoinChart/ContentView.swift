@@ -19,7 +19,8 @@ struct ContentView: View {
                                 onDelete: {
                                     viewModel.removeCryptoCurrency(at: index)
                                 },
-                                isLoading: viewModel.refreshingCurrencies.contains(currency.name)
+                                isLoading: viewModel.refreshingCurrencies.contains(currency.name),
+                                timeRange: viewModel.selectedTimeRange
                             )
                             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                             .listRowSeparator(.visible)
@@ -37,6 +38,10 @@ struct ContentView: View {
             }
             .navigationTitle("CoinChart")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    TimeRangeButton(viewModel: viewModel)
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         showingAddAlert = true
@@ -58,5 +63,29 @@ struct ContentView: View {
                 }
             }
         }
+    }
+}
+
+struct TimeRangeButton: View {
+    @ObservedObject var viewModel: CryptoViewModel
+    
+    var body: some View {
+        Menu {
+            ForEach(TimeRange.allCases, id: \.self) { timeRange in
+                Button(action: {
+                    viewModel.changeTimeRange(to: timeRange)
+                }) {
+                    HStack {
+                        Text(timeRange.displayName)
+                        if viewModel.selectedTimeRange == timeRange {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Text(viewModel.selectedTimeRange.displayName)
+        }
+        .menuStyle(BorderlessButtonMenuStyle())
     }
 }

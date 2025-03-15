@@ -1,6 +1,35 @@
 import Foundation
 import SwiftUI
 
+// 添加时间范围枚举
+enum TimeRange: String, CaseIterable, Codable {
+    case day = "24_hours"
+    case week = "7_days"
+    case month = "30_days"
+    case threeMonths = "90_days"
+    case max = "max"
+    
+    var displayName: String {
+        switch self {
+        case .day: return "天"
+        case .week: return "周"
+        case .month: return "月"
+        case .threeMonths: return "3月"
+        case .max: return "MAX"
+        }
+    }
+    
+    var next: TimeRange {
+        switch self {
+        case .day: return .week
+        case .week: return .month
+        case .month: return .threeMonths
+        case .threeMonths: return .max
+        case .max: return .day
+        }
+    }
+}
+
 struct SavedCurrency: Codable {
     let name: String
 }
@@ -9,9 +38,13 @@ class CryptoViewModel: ObservableObject {
     @Published var cryptocurrencies: [CryptoCurrency] = []
     @Published var isInitialLoading = false
     @Published var refreshingCurrencies: Set<String> = []
+    @Published var selectedTimeRange: TimeRange = .day
+    
     private let userDefaultsKey = "savedCurrencyNames"
+    private let timeRangeKey = "selectedTimeRange"
     
     init() {
+        loadSelectedTimeRange()
         loadSavedCurrencies()
     }
     
@@ -25,6 +58,35 @@ class CryptoViewModel: ObservableObject {
     func removeCryptoCurrency(at index: Int) {
         cryptocurrencies.remove(at: index)
         saveCurrencyNames()
+    }
+    
+    private func loadSelectedTimeRange() {
+        if let data = UserDefaults.standard.data(forKey: timeRangeKey),
+           let savedTimeRange = try? JSONDecoder().decode(TimeRange.self, from: data) {
+            selectedTimeRange = savedTimeRange
+        }
+    }
+    
+    func saveSelectedTimeRange() {
+        if let encoded = try? JSONEncoder().encode(selectedTimeRange) {
+            UserDefaults.standard.set(encoded, forKey: timeRangeKey)
+        }
+    }
+    
+    func changeTimeRange(to timeRange: TimeRange) {
+        selectedTimeRange = timeRange
+        saveSelectedTimeRange()
+        Task { @MainActor in
+            await refreshData()
+        }
+    }
+    
+    func cycleToNextTimeRange() {
+        selectedTimeRange = selectedTimeRange.next
+        saveSelectedTimeRange()
+        Task { @MainActor in
+            await refreshData()
+        }
     }
     
     private func loadSavedCurrencies() {
@@ -60,9 +122,7 @@ class CryptoViewModel: ObservableObject {
         for (index, currency) in cryptocurrencies.enumerated() {
             let task = Task {
                 await fetchDataAsync(for: currency.name, index: index)
-                await MainActor.run {
-                    refreshingCurrencies.remove(currency.name)
-                }
+                refreshingCurrencies.remove(currency.name)
             }
             tasks.append(task)
         }
@@ -75,7 +135,7 @@ class CryptoViewModel: ObservableObject {
     }
     
     private func fetchDataAsync(for currency: String, index: Int) async {
-        let urlString = "https://www.coingecko.com/price_charts/\(currency.lowercased())/usd/24_hours.json"
+        let urlString = "https://www.coingecko.com/price_charts/\(currency.lowercased())/usd/\(selectedTimeRange.rawValue).json"
         guard let url = URL(string: urlString) else { return }
         
         do {
@@ -93,7 +153,7 @@ class CryptoViewModel: ObservableObject {
                 if let lastPrice = prices.last, let firstPrice = prices.first {
                     cryptocurrencies[index].currentPrice = lastPrice
                     let priceChange = ((lastPrice - firstPrice) / firstPrice) * 100
-                    cryptocurrencies[index].priceChange24h = Double(round(priceChange * 100) / 100)
+                    cryptocurrencies[index].priceChange = Double(round(priceChange * 100) / 100)
                 }
             }
         } catch {

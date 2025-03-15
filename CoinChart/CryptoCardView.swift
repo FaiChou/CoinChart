@@ -5,6 +5,7 @@ struct CryptoCardView: View {
     let currency: CryptoCurrency
     let onDelete: () -> Void
     let isLoading: Bool
+    var timeRange: TimeRange = .day
     
     private func formatPrice(_ price: Double) -> String {
         if price >= 1 {
@@ -21,7 +22,7 @@ struct CryptoCardView: View {
     }
     
     private var priceColor: Color {
-        currency.priceChange24h >= 0 ? .green : .red
+        currency.priceChange >= 0 ? .green : .red
     }
     
     var body: some View {
@@ -31,7 +32,8 @@ struct CryptoCardView: View {
             priceColor: priceColor,
             formatPrice: formatPrice,
             formatPercentage: formatPercentage,
-            onDelete: onDelete
+            onDelete: onDelete,
+            timeRange: timeRange
         )
     }
 }
@@ -44,6 +46,7 @@ private struct CardContent: View {
     let formatPrice: (Double) -> String
     let formatPercentage: (Double) -> String
     let onDelete: () -> Void
+    let timeRange: TimeRange
     
     var body: some View {
         HStack(spacing: 12) {
@@ -65,7 +68,7 @@ private struct CardContent: View {
                     .font(.subheadline)
                     .bold()
                 
-                Text("\(currency.priceChange24h >= 0 ? "+" : "")\(formatPercentage(currency.priceChange24h))%")
+                Text("\(currency.priceChange >= 0 ? "+" : "")\(formatPercentage(currency.priceChange))%")
                     .foregroundColor(priceColor)
                     .font(.caption)
             }
