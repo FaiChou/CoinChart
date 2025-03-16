@@ -1,7 +1,6 @@
 import Foundation
 import SwiftUI
 
-// 添加时间范围枚举
 enum TimeRange: String, CaseIterable, Codable {
     case day = "24_hours"
     case week = "7_days"
@@ -18,16 +17,6 @@ enum TimeRange: String, CaseIterable, Codable {
         case .max: return "MAX"
         }
     }
-    
-    var next: TimeRange {
-        switch self {
-        case .day: return .week
-        case .week: return .month
-        case .month: return .threeMonths
-        case .threeMonths: return .max
-        case .max: return .day
-        }
-    }
 }
 
 struct SavedCurrency: Codable {
@@ -36,7 +25,6 @@ struct SavedCurrency: Codable {
 
 class CryptoViewModel: ObservableObject {
     @Published var cryptocurrencies: [CryptoCurrency] = []
-    @Published var isInitialLoading = false
     @Published var refreshingCurrencies: Set<String> = []
     @Published var selectedTimeRange: TimeRange = .day
     
@@ -81,24 +69,12 @@ class CryptoViewModel: ObservableObject {
         }
     }
     
-    func cycleToNextTimeRange() {
-        selectedTimeRange = selectedTimeRange.next
-        saveSelectedTimeRange()
-        Task { @MainActor in
-            await refreshData()
-        }
-    }
-    
     private func loadSavedCurrencies() {
         if let data = UserDefaults.standard.data(forKey: userDefaultsKey),
            let savedCurrencies = try? JSONDecoder().decode([SavedCurrency].self, from: data) {
-            // 先创建空的加密货币对象
             cryptocurrencies = savedCurrencies.map { CryptoCurrency(name: $0.name) }
-            // 立即获取所有数据
-            Task { @MainActor in
-                isInitialLoading = true
+            Task {
                 await refreshData()
-                isInitialLoading = false
             }
         }
     }
@@ -112,13 +88,10 @@ class CryptoViewModel: ObservableObject {
     
     @MainActor
     func refreshData() async {
-        // 标记所有货币为刷新状态
         refreshingCurrencies = Set(cryptocurrencies.map { $0.name })
         
-        // 创建一个任务数组
         var tasks: [Task<Void, Never>] = []
         
-        // 为每个加密货币创建一个异步任务
         for (index, currency) in cryptocurrencies.enumerated() {
             let task = Task {
                 await fetchDataAsync(for: currency.name, index: index)
@@ -127,7 +100,6 @@ class CryptoViewModel: ObservableObject {
             tasks.append(task)
         }
         
-        // 等待所有任务完成
         for task in tasks {
             await task.value
         }
