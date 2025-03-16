@@ -1,25 +1,11 @@
 import Foundation
 import SwiftUI
 
-enum TimeRange: String, CaseIterable, Codable {
-    case day = "24_hours"
-    case week = "7_days"
-    case month = "30_days"
-    case threeMonths = "90_days"
-    case max = "max"
-    
-    var displayName: String {
-        switch self {
-        case .day: return "天"
-        case .week: return "周"
-        case .month: return "月"
-        case .threeMonths: return "3月"
-        case .max: return "MAX"
-        }
-    }
+private struct CoinGeckoResponse: Codable {
+    let stats: [[Double]]
 }
 
-struct SavedCurrency: Codable {
+private struct SavedCurrency: Codable {
     let name: String
 }
 

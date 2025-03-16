@@ -17,7 +17,3 @@ struct CryptoCurrency: Identifiable, Codable {
         self.refreshing = true
     }
 }
-
-struct CoinGeckoResponse: Codable {
-    let stats: [[Double]]
-}

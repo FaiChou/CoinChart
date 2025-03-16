@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct CoinListView: View {
     @StateObject private var viewModel = CryptoViewModel()
     @State private var showingAddAlert = false
     @State private var newCryptoName = ""
@@ -9,7 +9,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 ForEach(viewModel.cryptocurrencies) {
-                    CryptoCardView(
+                    CryptoItem(
                         currency: $0,
                         timeRange: viewModel.selectedTimeRange
                     )
@@ -26,7 +26,23 @@ struct ContentView: View {
             .navigationTitle("CoinChart")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    TimeRangeButton(viewModel: viewModel)
+                    Menu {
+                        ForEach(TimeRange.allCases, id: \.self) { timeRange in
+                            Button(action: {
+                                viewModel.changeTimeRange(to: timeRange)
+                            }) {
+                                HStack {
+                                    Text(timeRange.displayName)
+                                    if viewModel.selectedTimeRange == timeRange {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(viewModel.selectedTimeRange.displayName)
+                    }
+                    .menuStyle(BorderlessButtonMenuStyle())
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -52,26 +68,3 @@ struct ContentView: View {
     }
 }
 
-struct TimeRangeButton: View {
-    @ObservedObject var viewModel: CryptoViewModel
-    
-    var body: some View {
-        Menu {
-            ForEach(TimeRange.allCases, id: \.self) { timeRange in
-                Button(action: {
-                    viewModel.changeTimeRange(to: timeRange)
-                }) {
-                    HStack {
-                        Text(timeRange.displayName)
-                        if viewModel.selectedTimeRange == timeRange {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-        } label: {
-            Text(viewModel.selectedTimeRange.displayName)
-        }
-        .menuStyle(BorderlessButtonMenuStyle())
-    }
-}
