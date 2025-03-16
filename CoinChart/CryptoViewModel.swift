@@ -25,7 +25,6 @@ struct SavedCurrency: Codable {
 
 class CryptoViewModel: ObservableObject {
     @Published var cryptocurrencies: [CryptoCurrency] = []
-    @Published var refreshingCurrencies: Set<String> = []
     @Published var selectedTimeRange: TimeRange = .day
     
     private let userDefaultsKey = "savedCurrencyNames"
@@ -39,7 +38,9 @@ class CryptoViewModel: ObservableObject {
     func addCryptoCurrency(_ name: String) {
         let newCrypto = CryptoCurrency(name: name)
         cryptocurrencies.append(newCrypto)
-        fetchData(for: name, index: cryptocurrencies.count - 1)
+        Task {
+            await fetchData(for: cryptocurrencies.last!)
+        }
         saveCurrencyNames()
     }
     
@@ -64,7 +65,7 @@ class CryptoViewModel: ObservableObject {
     func changeTimeRange(to timeRange: TimeRange) {
         selectedTimeRange = timeRange
         saveSelectedTimeRange()
-        Task { @MainActor in
+        Task {
             await refreshData()
         }
     }
@@ -86,58 +87,41 @@ class CryptoViewModel: ObservableObject {
         }
     }
     
-    @MainActor
     func refreshData() async {
-        refreshingCurrencies = Set(cryptocurrencies.map { $0.name })
-        
-        var tasks: [Task<Void, Never>] = []
-        
-        for (index, currency) in cryptocurrencies.enumerated() {
-            let task = Task {
-                await fetchDataAsync(for: currency.name, index: index)
-                refreshingCurrencies.remove(currency.name)
+        await withTaskGroup(of: Void.self) { group in
+            for crypto in cryptocurrencies {
+                group.addTask {
+                    await self.fetchData(for: crypto)
+                }
             }
-            tasks.append(task)
+            await group.waitForAll()
         }
-        
-        for task in tasks {
-            await task.value
-        }
-        
     }
     
-    private func fetchDataAsync(for currency: String, index: Int) async {
-        let urlString = "https://www.coingecko.com/price_charts/\(currency.lowercased())/usd/\(selectedTimeRange.rawValue).json"
+    @MainActor
+    private func fetchData(for currency: CryptoCurrency) async {
+        guard let index = cryptocurrencies.firstIndex(where: { $0.id == currency.id }) else {
+            return
+        }
+        cryptocurrencies[index].refreshing = true
+        let urlString = "https://www.coingecko.com/price_charts/\(currency.name.lowercased())/usd/\(selectedTimeRange.rawValue).json"
         guard let url = URL(string: urlString) else { return }
-        
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             guard let response = try? JSONDecoder().decode(CoinGeckoResponse.self, from: data) else {
                 return
             }
-            
-            await MainActor.run {
-                guard index < cryptocurrencies.count else { return }
-                
-                let prices = response.stats.map { $0[1] }
-                cryptocurrencies[index].chartData = prices
-                
-                if let lastPrice = prices.last, let firstPrice = prices.first {
-                    cryptocurrencies[index].currentPrice = lastPrice
-                    let priceChange = ((lastPrice - firstPrice) / firstPrice) * 100
-                    cryptocurrencies[index].priceChange = Double(round(priceChange * 100) / 100)
-                }
+            let prices = response.stats.map { $0[1] }
+            cryptocurrencies[index].chartData = prices
+            if let lastPrice = prices.last, let firstPrice = prices.first {
+                cryptocurrencies[index].currentPrice = lastPrice
+                let priceChange = ((lastPrice - firstPrice) / firstPrice) * 100
+                cryptocurrencies[index].priceChange = Double(round(priceChange * 100) / 100)
             }
+            cryptocurrencies[index].refreshing = false
         } catch {
             print("Error fetching data: \(error)")
+            cryptocurrencies[index].refreshing = false
         }
     }
-    
-    func fetchData(for currency: String, index: Int) {
-        Task { @MainActor in
-            refreshingCurrencies.insert(currency)
-            await fetchDataAsync(for: currency, index: index)
-            refreshingCurrencies.remove(currency)
-        }
-    }
-} 
+}

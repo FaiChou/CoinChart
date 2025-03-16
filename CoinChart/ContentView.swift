@@ -8,13 +8,9 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(Array(viewModel.cryptocurrencies.enumerated()), id: \.element.id) { index, currency in
+                ForEach(viewModel.cryptocurrencies) {
                     CryptoCardView(
-                        currency: currency,
-                        onDelete: {
-                            viewModel.removeCryptoCurrency(at: index)
-                        },
-                        isLoading: viewModel.refreshingCurrencies.contains(currency.name),
+                        currency: $0,
                         timeRange: viewModel.selectedTimeRange
                     )
                 }

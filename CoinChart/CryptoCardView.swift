@@ -3,8 +3,6 @@ import Charts
 
 struct CryptoCardView: View {
     let currency: CryptoCurrency
-    let onDelete: () -> Void
-    let isLoading: Bool
     var timeRange: TimeRange = .day
     
     private func formatPrice(_ price: Double) -> String {
@@ -26,35 +24,12 @@ struct CryptoCardView: View {
     }
     
     var body: some View {
-        CardContent(
-            currency: currency,
-            isLoading: isLoading,
-            priceColor: priceColor,
-            formatPrice: formatPrice,
-            formatPercentage: formatPercentage,
-            onDelete: onDelete,
-            timeRange: timeRange
-        )
-    }
-}
-
-
-private struct CardContent: View {
-    let currency: CryptoCurrency
-    let isLoading: Bool
-    let priceColor: Color
-    let formatPrice: (Double) -> String
-    let formatPercentage: (Double) -> String
-    let onDelete: () -> Void
-    let timeRange: TimeRange
-    
-    var body: some View {
         HStack(spacing: 12) {
             Text(currency.name)
                 .font(.subheadline)
                 .frame(width: 80, alignment: .leading)
             
-            if isLoading {
+            if currency.refreshing {
                 ProgressView()
                     .frame(maxWidth: .infinity)
             } else if !currency.chartData.isEmpty {
@@ -62,26 +37,20 @@ private struct CardContent: View {
             } else {
                 Spacer()
             }
-            
-            VStack(alignment: .trailing, spacing: 2) {
-                Text("$\(formatPrice(currency.currentPrice))")
-                    .font(.subheadline)
-                    .bold()
-                
-                Text("\(currency.priceChange >= 0 ? "+" : "")\(formatPercentage(currency.priceChange))%")
-                    .foregroundColor(priceColor)
-                    .font(.caption)
+            if !currency.refreshing {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("$\(formatPrice(currency.currentPrice))")
+                        .font(.subheadline)
+                        .bold()
+                    
+                    Text("\(currency.priceChange >= 0 ? "+" : "")\(formatPercentage(currency.priceChange))%")
+                        .foregroundColor(priceColor)
+                        .font(.caption)
+                }
+                .frame(width: 100, alignment: .trailing)
             }
-            .frame(width: 100, alignment: .trailing)
         }
         .frame(height: 60)
-        .contextMenu {
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label("删除", systemImage: "trash")
-            }
-        }
     }
 }
 
@@ -134,4 +103,4 @@ private struct ChartView: View {
         .frame(height: 40)
         .frame(maxWidth: .infinity)
     }
-} 
+}

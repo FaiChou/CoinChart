@@ -3,6 +3,7 @@ import Foundation
 struct CryptoCurrency: Identifiable, Codable {
     let id: String
     var name: String
+    var refreshing: Bool
     var currentPrice: Double
     var priceChange: Double
     var chartData: [Double]
@@ -13,9 +14,10 @@ struct CryptoCurrency: Identifiable, Codable {
         self.currentPrice = 0
         self.priceChange = 0
         self.chartData = []
+        self.refreshing = true
     }
 }
 
 struct CoinGeckoResponse: Codable {
     let stats: [[Double]]
-} 
+}
