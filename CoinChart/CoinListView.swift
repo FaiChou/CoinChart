@@ -9,10 +9,7 @@ struct CoinListView: View {
         NavigationStack {
             List {
                 ForEach(viewModel.cryptocurrencies) {
-                    CryptoItem(
-                        currency: $0,
-                        timeRange: viewModel.selectedTimeRange
-                    )
+                    CryptoItem(currency: $0)
                 }
                 .onDelete { indexSet in
                     for index in indexSet.sorted(by: >) {
@@ -29,7 +26,7 @@ struct CoinListView: View {
                     Menu {
                         ForEach(TimeRange.allCases, id: \.self) { timeRange in
                             Button(action: {
-                                viewModel.changeTimeRange(to: timeRange)
+                                viewModel.selectedTimeRange = timeRange
                             }) {
                                 HStack {
                                     Text(timeRange.displayName)

@@ -6,6 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4D9149E52D8843F00071A45C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9149E42D8843F00071A45C /* WidgetKit.framework */; };
+		4D9149E72D8843F00071A45C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9149E62D8843F00071A45C /* SwiftUI.framework */; };
+		4D9149F22D8843F10071A45C /* CoinChartWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4D9149E22D8843F00071A45C /* CoinChartWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4D9149F02D8843F10071A45C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D9149662D8455720071A45C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D9149E12D8843F00071A45C;
+			remoteInfo = CoinChartWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		4D9149B32D8462F70071A45C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -13,6 +29,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				4D9149F22D8843F10071A45C /* CoinChartWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -21,12 +38,45 @@
 
 /* Begin PBXFileReference section */
 		4D91496E2D8455720071A45C /* CoinChart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoinChart.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D9149E22D8843F00071A45C /* CoinChartWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CoinChartWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D9149E42D8843F00071A45C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		4D9149E62D8843F00071A45C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4D41C2E12D8857F400BE6660 /* Exceptions for "CoinChart" folder in "CoinChartWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CoinChartView.swift,
+				Constants.swift,
+				CryptoCurrency.swift,
+			);
+			target = 4D9149E12D8843F00071A45C /* CoinChartWidgetExtension */;
+		};
+		4D9149F52D8843F10071A45C /* Exceptions for "CoinChartWidget" folder in "CoinChartWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4D9149E12D8843F00071A45C /* CoinChartWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D9149702D8455720071A45C /* CoinChart */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4D41C2E12D8857F400BE6660 /* Exceptions for "CoinChart" folder in "CoinChartWidgetExtension" target */,
+			);
 			path = CoinChart;
+			sourceTree = "<group>";
+		};
+		4D9149E82D8843F00071A45C /* CoinChartWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4D9149F52D8843F10071A45C /* Exceptions for "CoinChartWidget" folder in "CoinChartWidgetExtension" target */,
+			);
+			path = CoinChartWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -39,6 +89,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4D9149DF2D8843F00071A45C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D9149E72D8843F00071A45C /* SwiftUI.framework in Frameworks */,
+				4D9149E52D8843F00071A45C /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -46,6 +105,8 @@
 			isa = PBXGroup;
 			children = (
 				4D9149702D8455720071A45C /* CoinChart */,
+				4D9149E82D8843F00071A45C /* CoinChartWidget */,
+				4D9149E32D8843F00071A45C /* Frameworks */,
 				4D91496F2D8455720071A45C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,8 +115,18 @@
 			isa = PBXGroup;
 			children = (
 				4D91496E2D8455720071A45C /* CoinChart.app */,
+				4D9149E22D8843F00071A45C /* CoinChartWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		4D9149E32D8843F00071A45C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4D9149E42D8843F00071A45C /* WidgetKit.framework */,
+				4D9149E62D8843F00071A45C /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -73,6 +144,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4D9149F12D8843F10071A45C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				4D9149702D8455720071A45C /* CoinChart */,
@@ -83,6 +155,28 @@
 			productName = CoinChart;
 			productReference = 4D91496E2D8455720071A45C /* CoinChart.app */;
 			productType = "com.apple.product-type.application";
+		};
+		4D9149E12D8843F00071A45C /* CoinChartWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D9149F62D8843F10071A45C /* Build configuration list for PBXNativeTarget "CoinChartWidgetExtension" */;
+			buildPhases = (
+				4D9149DE2D8843F00071A45C /* Sources */,
+				4D9149DF2D8843F00071A45C /* Frameworks */,
+				4D9149E02D8843F00071A45C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4D9149E82D8843F00071A45C /* CoinChartWidget */,
+			);
+			name = CoinChartWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = CoinChartWidgetExtension;
+			productReference = 4D9149E22D8843F00071A45C /* CoinChartWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -95,6 +189,9 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					4D91496D2D8455720071A45C = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					4D9149E12D8843F00071A45C = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -116,12 +213,20 @@
 			projectRoot = "";
 			targets = (
 				4D91496D2D8455720071A45C /* CoinChart */,
+				4D9149E12D8843F00071A45C /* CoinChartWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4D91496C2D8455720071A45C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D9149E02D8843F00071A45C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -138,7 +243,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4D9149DE2D8843F00071A45C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4D9149F12D8843F10071A45C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D9149E12D8843F00071A45C /* CoinChartWidgetExtension */;
+			targetProxy = 4D9149F02D8843F10071A45C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4D91497A2D8455750071A45C /* Debug */ = {
@@ -316,6 +436,60 @@
 			};
 			name = Release;
 		};
+		4D9149F32D8843F10071A45C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7WS42S6435;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoinChartWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CoinChartWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faichou.CoinChart.CoinChartWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4D9149F42D8843F10071A45C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7WS42S6435;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoinChartWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CoinChartWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.faichou.CoinChart.CoinChartWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -333,6 +507,15 @@
 			buildConfigurations = (
 				4D91497D2D8455750071A45C /* Debug */,
 				4D91497E2D8455750071A45C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D9149F62D8843F10071A45C /* Build configuration list for PBXNativeTarget "CoinChartWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D9149F32D8843F10071A45C /* Debug */,
+				4D9149F42D8843F10071A45C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

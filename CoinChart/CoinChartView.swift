@@ -4,7 +4,7 @@ import Charts
 struct CoinChartView: View {
     let chartData: [Double]
     let priceColor: Color
-    
+    let height: CGFloat
     var body: some View {
         let minPrice = chartData.min() ?? 0
         let maxPrice = chartData.max() ?? 0
@@ -47,7 +47,7 @@ struct CoinChartView: View {
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
         .chartYScale(domain: baseline...maxPrice + priceRange * 0.1)
-        .frame(height: 40)
+        .frame(height: height)
         .frame(maxWidth: .infinity)
     }
 }
