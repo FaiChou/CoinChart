@@ -21,33 +21,27 @@ struct Provider: TimelineProvider {
         btc.currentPrice = 55000
         btc.priceChange = 0.1
         btc.chartData = [50000, 51000, 52000, 53000, 54000, 55000]
-        btc.refreshing = false
         eth.currentPrice = 1500
         eth.priceChange = -0.1
         eth.chartData = [2000, 1900, 1800, 1700, 1600, 1500]
-        eth.refreshing = false
         doge.currentPrice = 1
         doge.priceChange = 0.2
         doge.chartData = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-        doge.refreshing = false
-        sol.currentPrice = 100
+        sol.currentPrice = 115
         sol.priceChange = 0.3
         sol.chartData = [90, 95, 100, 105, 110, 115]
-        sol.refreshing = false
-        bnb.currentPrice = 200
+        bnb.currentPrice = 240
         bnb.priceChange = -0.2
         bnb.chartData = [190, 200, 210, 220, 230, 240]
-        bnb.refreshing = false
         ada.currentPrice = 3
         ada.priceChange = 0.1
         ada.chartData = [2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
-        ada.refreshing = false
-        xrp.currentPrice = 0.5
+        xrp.currentPrice = 0.65
         xrp.priceChange = 0.4
         xrp.chartData = [0.4, 0.45, 0.5, 0.55, 0.6, 0.65]
-        xrp.refreshing = false
         dot.currentPrice = 15
         dot.priceChange = 0.5
+        dot.chartData = [10, 11, 12, 13, 14, 15]
         return CoinChartEntry(date: Date(), coinData: [btc, eth, doge, sol, bnb, ada, xrp, dot])
     }
 
@@ -132,12 +126,16 @@ struct CoinChartWidgetEntryView : View {
                         .bold()
                         .font(widgetFamily != .systemSmall ? .subheadline : .caption)
                         .frame(width: widgetFamily != .systemSmall ? 90 : 60, alignment: .leading)
-                    if widgetFamily != .systemSmall && !currency.chartData.isEmpty {
-                        CoinChartView(
-                            chartData: currency.chartData,
-                            priceColor: currency.priceChange >= 0 ? .green : .red,
-                            height: 30
-                        )
+                    if widgetFamily != .systemSmall {
+                        if !currency.chartData.isEmpty {
+                            CoinChartView(
+                                chartData: currency.chartData,
+                                priceColor: currency.priceChange >= 0 ? .green : .red,
+                                height: 30
+                            )
+                        } else {
+                            Spacer()
+                        }
                     }
                     VStack(alignment: .trailing, spacing: 2) {
                         Text("$\(formatPrice(currency.currentPrice))")
