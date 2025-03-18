@@ -92,6 +92,13 @@ struct Provider: TimelineProvider {
                 }
             }
         }
+        currencies.sort { (c1, c2) in
+            guard let index1 = savedCurrencies.firstIndex(of: c1.name),
+                  let index2 = savedCurrencies.firstIndex(of: c2.name) else {
+                return false
+            }
+            return index1 < index2
+        }
         return currencies
     }
 }
