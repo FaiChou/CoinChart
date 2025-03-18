@@ -84,4 +84,3 @@ struct CoinListView: View {
         }
     }
 }
-

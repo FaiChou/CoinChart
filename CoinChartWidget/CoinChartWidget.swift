@@ -10,35 +10,26 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> CoinChartEntry {
-        CoinChartEntry(date: Date(), coinData: [])
+        var btc = CryptoCurrency(name: "bitcoin")
+        var eth = CryptoCurrency(name: "ethereum")
+        var doge = CryptoCurrency(name: "dogecoin")
+        btc.currentPrice = 55000
+        btc.priceChange = 0.1
+        btc.chartData = [50000, 51000, 52000, 53000, 54000, 55000]
+        btc.refreshing = false
+        eth.currentPrice = 1500
+        eth.priceChange = -0.1
+        eth.chartData = [2000, 1900, 1800, 1700, 1600, 1500]
+        eth.refreshing = false
+        doge.currentPrice = 1
+        doge.priceChange = 0.2
+        doge.chartData = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+        doge.refreshing = false
+        return CoinChartEntry(date: Date(), coinData: [btc, eth, doge])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CoinChartEntry) -> ()) {
-        if context.isPreview {
-            var btc = CryptoCurrency(name: "bitcoin")
-            var eth = CryptoCurrency(name: "ethereum")
-            var doge = CryptoCurrency(name: "dogecoin")
-            btc.currentPrice = 55000
-            btc.priceChange = 0.1
-            btc.chartData = [50000, 51000, 52000, 53000, 54000, 55000]
-            btc.refreshing = false
-            eth.currentPrice = 1500
-            eth.priceChange = -0.1
-            eth.chartData = [2000, 1900, 1800, 1700, 1600, 1500]
-            eth.refreshing = false
-            doge.currentPrice = 1
-            doge.priceChange = 0.2
-            doge.chartData = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-            doge.refreshing = false
-            let entry = CoinChartEntry(date: Date(), coinData: [btc, eth, doge])
-            completion(entry)
-        } else {
-            Task {
-                let currencies = await loadCoinData()
-                let entry = CoinChartEntry(date: Date(), coinData: currencies)
-                completion(entry)
-            }
-        }
+        completion(placeholder(in: context))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
@@ -46,10 +37,8 @@ struct Provider: TimelineProvider {
             let currencies = await loadCoinData()
             let currentDate = Date()
             let entry = CoinChartEntry(date: currentDate, coinData: currencies)
-            
             let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!
             let timeline = Timeline(entries: [entry], policy: .after(nextUpdateDate))
-            
             completion(timeline)
         }
     }
@@ -59,26 +48,34 @@ struct Provider: TimelineProvider {
            let savedRange = try? JSONDecoder().decode(TimeRange.self, from: value) {
             timeRange = savedRange
         }
-        if let data = UserDefaults(suiteName: groupKey)?.data(forKey: savedCurrencyNamesKey),
-           let savedCurrencies = try? JSONDecoder().decode([SavedCurrency].self, from: data) {
-            let firstThree = savedCurrencies.prefix(3)
-            var currencies: [CryptoCurrency] = []
-            await withTaskGroup(of: CryptoCurrency?.self) { group in
-                for currency in firstThree {
-                    group.addTask {
-                        await fetchCryptoCurrencyData(for: currency.name, timeRange: timeRange)
-                    }
-                }
-                
-                for await result in group {
-                    if let currency = result {
-                        currencies.append(currency)
-                    }
+        guard let data = UserDefaults(suiteName: groupKey)?.data(forKey: savedCurrencyNamesKey) else {
+            print("No saved currency data found")
+            return []
+        }
+        let savedCurrencies: [String]
+        do {
+            savedCurrencies = try JSONDecoder().decode([String].self, from: data)
+        } catch {
+            print("Failed to decode currencies: \(error)")
+            return []
+        }
+        if savedCurrencies.isEmpty {
+            return []
+        }
+        var currencies: [CryptoCurrency] = []
+        await withTaskGroup(of: CryptoCurrency?.self) { group in
+            for currency in savedCurrencies {
+                group.addTask {
+                    await fetchCryptoCurrencyData(for: currency, timeRange: timeRange)
                 }
             }
-            return currencies
+            for await result in group {
+                if let currency = result {
+                    currencies.append(currency)
+                }
+            }
         }
-        return []
+        return currencies
     }
 }
 
@@ -89,38 +86,46 @@ struct CoinChartEntry: TimelineEntry {
 
 struct CoinChartWidgetEntryView : View {
     var entry: Provider.Entry
-
+    @Environment(\.widgetFamily) var widgetFamily
+    private var displayedCoinData: [CryptoCurrency] {
+        switch widgetFamily {
+        case .systemSmall, .systemMedium:
+            return Array(entry.coinData.prefix(4))
+        case .systemLarge:
+            return Array(entry.coinData.prefix(10))
+        default:
+            return Array(entry.coinData.prefix(4))
+        }
+    }
     var body: some View {
         VStack {
             if entry.coinData.isEmpty {
                 Text("请进入应用添加货币")
                     .font(.subheadline)
             }
-            ForEach(entry.coinData, id: \.id) {currency in
+            ForEach(displayedCoinData, id: \.id) {currency in
                 HStack(spacing: 12) {
                     Text(currency.name)
-                        .font(.subheadline)
-                        .frame(width: 80, alignment: .leading)
-                    
-                    if !currency.chartData.isEmpty {
+                        .bold()
+                        .font(widgetFamily != .systemSmall ? .subheadline : .caption)
+                        .frame(width: widgetFamily != .systemSmall ? 90 : 60, alignment: .leading)
+                    if widgetFamily != .systemSmall && !currency.chartData.isEmpty {
                         CoinChartView(
                             chartData: currency.chartData,
                             priceColor: currency.priceChange >= 0 ? .green : .red,
                             height: 30
                         )
-                    } else {
-                        Spacer()
                     }
                     VStack(alignment: .trailing, spacing: 2) {
                         Text("$\(formatPrice(currency.currentPrice))")
-                            .font(.subheadline)
                             .bold()
+                            .font(widgetFamily != .systemSmall ? .subheadline : .caption)
                         
                         Text("\(currency.priceChange >= 0 ? "+" : "")\(formatPercentage(currency.priceChange))%")
                             .foregroundColor(currency.priceChange >= 0 ? .green : .red)
-                            .font(.caption)
+                            .font(.caption2)
                     }
-                    .frame(width: 100, alignment: .trailing)
+                    .frame(width: widgetFamily != .systemSmall ? 90 : 60, alignment: .trailing)
                 }
                 .frame(height: 30)
             }

@@ -16,9 +16,9 @@ struct CryptoViewItem: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(name)
+                .bold()
                 .font(.subheadline)
                 .frame(width: 80, alignment: .leading)
-            
             if refreshing {
                 ProgressView()
                     .frame(maxWidth: .infinity)
