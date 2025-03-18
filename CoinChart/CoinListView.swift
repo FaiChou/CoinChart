@@ -1,43 +1,51 @@
 import SwiftUI
 
 struct CoinListView: View {
-    @StateObject private var viewModel = CryptoViewModel()
+    @AppStorage(selectedTimeRangeKey, store: UserDefaults(suiteName: groupKey))
+    var selectedTimeRange: TimeRange = .day
+
+    @State private var currencyNames: [String] = []
     @State private var showingAddAlert = false
     @State private var newCryptoName = ""
-    
+    @State private var updater = 1
+
     var body: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.cryptocurrencies) {
-                    CryptoItem(currency: $0)
+                ForEach(currencyNames, id: \.self) {
+                    CryptoViewItem(name: $0, timeRange: selectedTimeRange, updater: updater)
                 }
                 .onDelete { indexSet in
                     for index in indexSet.sorted(by: >) {
-                        viewModel.removeCryptoCurrency(at: index)
+                        currencyNames.remove(at: index)
+                        saveCurrencyNames()
                     }
                 }
             }
             .refreshable {
-                await viewModel.refreshData()
+                updater += 1
+            }
+            .onAppear {
+                loadSavedCurrencies()
             }
             .navigationTitle("CoinChart")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Menu {
                         ForEach(TimeRange.allCases, id: \.self) { timeRange in
-                            Button(action: {
-                                viewModel.selectedTimeRange = timeRange
-                            }) {
+                            Button {
+                                selectedTimeRange = timeRange
+                            } label: {
                                 HStack {
                                     Text(timeRange.displayName)
-                                    if viewModel.selectedTimeRange == timeRange {
+                                    if selectedTimeRange == timeRange {
                                         Image(systemName: "checkmark")
                                     }
                                 }
                             }
                         }
                     } label: {
-                        Text(viewModel.selectedTimeRange.displayName)
+                        Text(selectedTimeRange.displayName)
                     }
                     .menuStyle(BorderlessButtonMenuStyle())
                 }
@@ -56,11 +64,25 @@ struct CoinListView: View {
                 }
                 Button("添加") {
                     if !newCryptoName.isEmpty {
-                        viewModel.addCryptoCurrency(newCryptoName)
+                        currencyNames.append(newCryptoName)
+                        saveCurrencyNames()
                         newCryptoName = ""
                     }
                 }
             }
+        }
+    }
+    private func loadSavedCurrencies() {
+        if let data = UserDefaults(suiteName: groupKey)?.data(forKey: savedCurrencyNamesKey),
+           let savedCurrencies = try? JSONDecoder().decode([SavedCurrency].self, from: data) {
+            currencyNames = savedCurrencies.map { $0.name }
+        }
+    }
+    
+    private func saveCurrencyNames() {
+        let savedCurrencies = currencyNames.map { SavedCurrency(name: $0) }
+        if let encoded = try? JSONEncoder().encode(savedCurrencies) {
+            UserDefaults(suiteName: groupKey)?.set(encoded, forKey: savedCurrencyNamesKey)
         }
     }
 }
