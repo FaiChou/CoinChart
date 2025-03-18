@@ -13,6 +13,11 @@ struct Provider: TimelineProvider {
         var btc = CryptoCurrency(name: "bitcoin")
         var eth = CryptoCurrency(name: "ethereum")
         var doge = CryptoCurrency(name: "dogecoin")
+        var sol = CryptoCurrency(name: "solana")
+        var bnb = CryptoCurrency(name: "binance coin")
+        var ada = CryptoCurrency(name: "cardano")
+        var xrp = CryptoCurrency(name: "xrp")
+        var dot = CryptoCurrency(name: "polkadot")
         btc.currentPrice = 55000
         btc.priceChange = 0.1
         btc.chartData = [50000, 51000, 52000, 53000, 54000, 55000]
@@ -25,7 +30,25 @@ struct Provider: TimelineProvider {
         doge.priceChange = 0.2
         doge.chartData = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         doge.refreshing = false
-        return CoinChartEntry(date: Date(), coinData: [btc, eth, doge])
+        sol.currentPrice = 100
+        sol.priceChange = 0.3
+        sol.chartData = [90, 95, 100, 105, 110, 115]
+        sol.refreshing = false
+        bnb.currentPrice = 200
+        bnb.priceChange = -0.2
+        bnb.chartData = [190, 200, 210, 220, 230, 240]
+        bnb.refreshing = false
+        ada.currentPrice = 3
+        ada.priceChange = 0.1
+        ada.chartData = [2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
+        ada.refreshing = false
+        xrp.currentPrice = 0.5
+        xrp.priceChange = 0.4
+        xrp.chartData = [0.4, 0.45, 0.5, 0.55, 0.6, 0.65]
+        xrp.refreshing = false
+        dot.currentPrice = 15
+        dot.priceChange = 0.5
+        return CoinChartEntry(date: Date(), coinData: [btc, eth, doge, sol, bnb, ada, xrp, dot])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CoinChartEntry) -> ()) {
