@@ -36,10 +36,6 @@ enum TimeRange: String, CaseIterable, Codable {
     }
 }
 
-struct SavedCurrency: Codable {
-    let name: String
-}
-
 private struct CoinGeckoResponse: Codable {
     let stats: [[Double]]
 }

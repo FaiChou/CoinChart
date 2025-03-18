@@ -74,14 +74,12 @@ struct CoinListView: View {
     }
     private func loadSavedCurrencies() {
         if let data = UserDefaults(suiteName: groupKey)?.data(forKey: savedCurrencyNamesKey),
-           let savedCurrencies = try? JSONDecoder().decode([SavedCurrency].self, from: data) {
-            currencyNames = savedCurrencies.map { $0.name }
+           let savedCurrencies = try? JSONDecoder().decode([String].self, from: data) {
+            currencyNames = savedCurrencies
         }
     }
-    
     private func saveCurrencyNames() {
-        let savedCurrencies = currencyNames.map { SavedCurrency(name: $0) }
-        if let encoded = try? JSONEncoder().encode(savedCurrencies) {
+        if let encoded = try? JSONEncoder().encode(currencyNames) {
             UserDefaults(suiteName: groupKey)?.set(encoded, forKey: savedCurrencyNamesKey)
         }
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 let groupKey = "group.com.faichou.coinchart"
-let savedCurrencyNamesKey = "savedCurrencyNames"
+let savedCurrencyNamesKey = "savedCurrencyNamesV2"
 let selectedTimeRangeKey = "selectedTimeRange"
 
 func formatPrice(_ price: Double) -> String {

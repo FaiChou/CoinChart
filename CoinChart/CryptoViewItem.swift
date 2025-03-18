@@ -28,7 +28,7 @@ struct CryptoViewItem: View {
                 Text(errorMsg)
                     .foregroundColor(.red)
             }
-            if !refreshing {
+            if !refreshing && errorMsg.isEmpty {
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("$\(formatPrice(currentPrice))")
                         .font(.subheadline)
