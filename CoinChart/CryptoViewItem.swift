@@ -41,6 +41,20 @@ struct CryptoViewItem: View {
                 .frame(width: 100, alignment: .trailing)
             }
         }
+        .contextMenu {
+            Button {
+                UIPasteboard.general.string = name
+            } label: {
+                Text("Copy Name")
+            }
+        } preview: {
+            if !chartData.isEmpty {
+                VStack {
+                    CoinChartView(chartData: chartData, priceColor: priceColor, height: 200)
+                }
+                .frame(width: 300)
+            }
+        }
         .frame(height: 60)
         .onAppear {
             fetch()
