@@ -132,7 +132,7 @@ struct CoinChartWidgetEntryView : View {
                     Text(currency.name)
                         .bold()
                         .font(widgetFamily != .systemSmall ? .subheadline : .caption)
-                        .frame(width: widgetFamily != .systemSmall ? 90 : 60, alignment: .leading)
+                        .frame(width: widgetFamily != .systemSmall ? 70 : 60, alignment: .leading)
                     if widgetFamily != .systemSmall {
                         if !currency.chartData.isEmpty {
                             CoinChartView(
@@ -153,7 +153,7 @@ struct CoinChartWidgetEntryView : View {
                             .foregroundColor(currency.priceChange >= 0 ? .green : .red)
                             .font(.caption2)
                     }
-                    .frame(width: widgetFamily != .systemSmall ? 90 : 60, alignment: .trailing)
+                    .frame(width: 60, alignment: .trailing)
                 }
                 .frame(height: 30)
             }
