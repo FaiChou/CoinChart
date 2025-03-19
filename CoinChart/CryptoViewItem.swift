@@ -38,7 +38,7 @@ struct CryptoViewItem: View {
                         .foregroundColor(priceColor)
                         .font(.caption)
                 }
-                .frame(width: 100, alignment: .trailing)
+                .frame(width: 70, alignment: .trailing)
             }
         }
         .contextMenu {
