@@ -61,8 +61,8 @@ struct Provider: TimelineProvider {
     }
     func loadCoinData() async -> [CryptoCurrency] {
         var timeRange: TimeRange = .day
-        if let value = UserDefaults(suiteName: groupKey)?.data(forKey: selectedTimeRangeKey),
-           let savedRange = try? JSONDecoder().decode(TimeRange.self, from: value) {
+        if let value = UserDefaults(suiteName: groupKey)?.string(forKey: selectedTimeRangeKey),
+           let savedRange = TimeRange(rawValue: value) {
             timeRange = savedRange
         }
         guard let data = UserDefaults(suiteName: groupKey)?.data(forKey: savedCurrencyNamesKey) else {
