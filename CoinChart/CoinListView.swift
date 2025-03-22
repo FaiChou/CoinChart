@@ -9,24 +9,36 @@ struct CoinListView: View {
     @State private var newCryptoName = ""
     @State private var updater = 1
 
+    @AppStorage("lastUpdateAt")
+    var lastUpdateAt: Date = Date()
+
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(currencyNames, id: \.self) {
-                    CryptoViewItem(name: $0, timeRange: selectedTimeRange, updater: updater)
-                }
-                .onDelete { indexSet in
-                    for index in indexSet.sorted(by: >) {
-                        currencyNames.remove(at: index)
-                        saveCurrencyNames()
+            VStack {
+                List {
+                    ForEach(currencyNames, id: \.self) {
+                        CryptoViewItem(name: $0, timeRange: selectedTimeRange, updater: updater)
+                    }
+                    .onDelete { indexSet in
+                        for index in indexSet.sorted(by: >) {
+                            currencyNames.remove(at: index)
+                            saveCurrencyNames()
+                        }
                     }
                 }
+                
+                Text("最后更新：\(lastUpdateAt.formatted(.dateTime))")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .padding(.vertical, 3)
             }
             .refreshable {
                 updater += 1
+                lastUpdateAt = Date()
             }
             .onAppear {
                 loadSavedCurrencies()
+                lastUpdateAt = Date()
             }
             .navigationTitle("CoinChart")
             .toolbar {
