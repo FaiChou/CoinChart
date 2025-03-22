@@ -22,8 +22,10 @@ struct CoinListView: View {
                     .onDelete { indexSet in
                         for index in indexSet.sorted(by: >) {
                             currencyNames.remove(at: index)
-                            saveCurrencyNames()
                         }
+                    }
+                    .onMove { from, to in
+                        currencyNames.move(fromOffsets: from, toOffset: to)
                     }
                 }
                 
@@ -31,6 +33,9 @@ struct CoinListView: View {
                     .font(.caption)
                     .foregroundColor(.gray)
                     .padding(.vertical, 3)
+            }
+            .onChange(of: currencyNames) {
+                saveCurrencyNames()
             }
             .refreshable {
                 updater += 1
@@ -71,9 +76,6 @@ struct CoinListView: View {
             }
             .sheet(isPresented: $showingAddSheet) {
                 AddCoinView(currencyNames: $currencyNames)
-                    .onChange(of: currencyNames) {
-                        saveCurrencyNames()
-                    }
             }
         }
     }
