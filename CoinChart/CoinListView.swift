@@ -5,7 +5,7 @@ struct CoinListView: View {
     var selectedTimeRange: TimeRange = .day
 
     @State private var currencyNames: [String] = []
-    @State private var showingAddAlert = false
+    @State private var showingAddSheet = false
     @State private var newCryptoName = ""
     @State private var updater = 1
 
@@ -63,24 +63,17 @@ struct CoinListView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        showingAddAlert = true
+                        showingAddSheet = true
                     }) {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .alert("添加新货币", isPresented: $showingAddAlert) {
-                TextField("输入加密货币名称", text: $newCryptoName)
-                Button("取消", role: .cancel) {
-                    newCryptoName = ""
-                }
-                Button("添加") {
-                    if !newCryptoName.isEmpty {
-                        currencyNames.append(newCryptoName)
+            .sheet(isPresented: $showingAddSheet) {
+                AddCoinView(currencyNames: $currencyNames)
+                    .onChange(of: currencyNames) {
                         saveCurrencyNames()
-                        newCryptoName = ""
                     }
-                }
             }
         }
     }
