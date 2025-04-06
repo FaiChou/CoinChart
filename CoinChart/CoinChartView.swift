@@ -5,6 +5,8 @@ struct CoinChartView: View {
     let chartData: [Double]
     let priceColor: Color
     let height: CGFloat
+    var isShowMaxMin: Bool = false
+    
     var body: some View {
         let minPrice = chartData.min() ?? 0
         let maxPrice = chartData.max() ?? 0
@@ -42,6 +44,34 @@ struct CoinChartView: View {
                 )
                 .foregroundStyle(priceColor)
                 .interpolationMethod(.catmullRom)
+            }
+            
+            if isShowMaxMin {
+                if let maxIndex = data.firstIndex(where: { $0.element == maxPrice }) {
+                    PointMark(
+                        x: .value("Time", maxIndex),
+                        y: .value("Price", maxPrice)
+                    )
+                    .foregroundStyle(priceColor)
+                    .annotation(position: maxIndex > data.count / 2 ? .leading : .trailing) {
+                        Text(formatPrice(maxPrice))
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                }
+                
+                if let minIndex = data.firstIndex(where: { $0.element == minPrice }) {
+                    PointMark(
+                        x: .value("Time", minIndex),
+                        y: .value("Price", minPrice)
+                    )
+                    .foregroundStyle(priceColor)
+                    .annotation(position: minIndex > data.count / 2 ? .leading : .trailing) {
+                        Text(formatPrice(minPrice))
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                }
             }
         }
         .chartXAxis(.hidden)

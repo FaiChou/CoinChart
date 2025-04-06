@@ -50,9 +50,9 @@ struct CryptoViewItem: View {
         } preview: {
             if !chartData.isEmpty {
                 VStack {
-                    CoinChartView(chartData: chartData, priceColor: priceColor, height: 200)
+                    CoinChartView(chartData: chartData, priceColor: priceColor, height: 220, isShowMaxMin: true)
                 }
-                .frame(width: 300)
+                .frame(width: 360)
             }
         }
         .frame(height: 60)
