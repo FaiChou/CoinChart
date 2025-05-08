@@ -56,7 +56,7 @@ struct CryptoViewItem: View {
             }
         }
         .frame(height: 60)
-        .onAppear {
+        .onForeground {
             fetch()
         }
         .onChange(of: timeRange) { oldValue, newValue in

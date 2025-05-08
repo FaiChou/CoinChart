@@ -41,6 +41,9 @@ struct CoinListView: View {
                 updater += 1
                 lastUpdateAt = Date()
             }
+            .onForeground {
+                lastUpdateAt = Date()
+            }
             .onAppear {
                 loadSavedCurrencies()
                 lastUpdateAt = Date()
@@ -89,5 +92,21 @@ struct CoinListView: View {
         if let encoded = try? JSONEncoder().encode(currencyNames) {
             UserDefaults(suiteName: groupKey)?.set(encoded, forKey: savedCurrencyNamesKey)
         }
+    }
+}
+
+extension View {
+    func onBackground(_ f: @escaping () -> Void) -> some View {
+        self.onReceive(
+            NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification),
+            perform: { _ in f() }
+        )
+    }
+    
+    func onForeground(_ f: @escaping () -> Void) -> some View {
+        self.onReceive(
+            NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification),
+            perform: { _ in f() }
+        )
     }
 }
