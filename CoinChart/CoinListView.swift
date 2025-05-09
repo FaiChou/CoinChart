@@ -9,8 +9,7 @@ struct CoinListView: View {
     @State private var newCryptoName = ""
     @State private var updater = 1
 
-    @AppStorage("lastUpdateAt")
-    var lastUpdateAt: Date = Date()
+    @State private var lastUpdateAt: Date = Date()
 
     var body: some View {
         NavigationStack {
@@ -42,7 +41,10 @@ struct CoinListView: View {
                 lastUpdateAt = Date()
             }
             .onForeground {
-                lastUpdateAt = Date()
+                let timeInterval = Date().timeIntervalSince(lastUpdateAt)
+                if timeInterval >= 60 {
+                    lastUpdateAt = Date()
+                }
             }
             .onAppear {
                 loadSavedCurrencies()

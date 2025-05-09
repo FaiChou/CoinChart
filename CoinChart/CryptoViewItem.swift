@@ -9,6 +9,7 @@ struct CryptoViewItem: View {
     @State private var currentPrice = 0.0
     @State private var chartData: [Double] = []
     @State private var errorMsg: String = ""
+    @State private var lastUpdateAt: Date = Date()
     private var priceColor: Color {
         priceChange >= 0 ? .green : .red
     }
@@ -57,6 +58,13 @@ struct CryptoViewItem: View {
         }
         .frame(height: 60)
         .onForeground {
+            let timeInterval = Date().timeIntervalSince(lastUpdateAt)
+            if timeInterval >= 60 {
+                fetch()
+            }
+        }
+        .onAppear {
+            // 必须要保留这个，因为上面的 onForeground 会在第一次打开时候无法刷新
             fetch()
         }
         .onChange(of: timeRange) { oldValue, newValue in
@@ -74,6 +82,7 @@ struct CryptoViewItem: View {
                 priceChange = result.priceChange
                 currentPrice = result.currentPrice
                 chartData = result.chartData
+                lastUpdateAt = Date()
             } else {
                 errorMsg = "请求错误"
             }
